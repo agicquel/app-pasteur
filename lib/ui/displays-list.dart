@@ -10,7 +10,6 @@ class DisplayScrollableView extends StatefulWidget {
   State<StatefulWidget> createState() {
     return new DisplayScrollableViewState();
   }
-
 }
 
 class DisplayScrollableViewState extends State<DisplayScrollableView> {
@@ -19,41 +18,61 @@ class DisplayScrollableViewState extends State<DisplayScrollableView> {
 
   @override
   Widget build(BuildContext context) {
-    if(loadingState) {
-      return new SpinKitWave(color: Theme.of(context).primaryColor,);
-    }
-    else {
+    if (loadingState) {
+      return new SpinKitWave(
+        color: Theme.of(context).primaryColor,
+      );
+    } else {
       return new LiquidPullToRefresh(
           onRefresh: _updateDisplays,
           child: ListView.builder(
               itemCount: _displays.length,
               itemBuilder: (context, index) {
                 Display display = _displays[index];
-                return new ListTile(
+                ListTile tile = new ListTile(
                   leading: Icon(Icons.cloud_queue),
-                  title: new Text('Name : ' + display.name),
-                  subtitle: Text('Message : ' + display.message),
+                  title: new Text('Nom : ' + display.name),
+                  subtitle: Text('ESP : ' +
+                      display.espId +
+                      '\nMessage : ' +
+                      display.message),
                   trailing: Icon(Icons.keyboard_arrow_right),
                   onTap: () {
-                    Navigator
-                        .push(context, new MaterialPageRoute(builder: (context) => new DisplayEditor(display: display,)))
-                        .then((value) {
-                          _updateDisplays();
+                    Navigator.push(
+                        context,
+                        new MaterialPageRoute(
+                            builder: (context) => new DisplayEditor(
+                                  display: display,
+                                ))).then((value) {
+                      _updateDisplays();
                     });
                   },
                 );
-              })
-      );
+                return new Card(
+                    elevation: 6.0,
+                    margin: new EdgeInsets.symmetric(
+                        horizontal: 10.0, vertical: 6.0),
+                    child: tile);
+              }));
     }
   }
 
   Future<void> _updateDisplays() async {
     loadingState = true;
-    var displays = await DisplayRequest.fetchDisplay();
-    setState(() {
-      _displays = displays;
-      loadingState = false;
-    });
+    try {
+      var displays = await DisplayRequest.fetchDisplay();
+      if (mounted) {
+        setState(() {
+          _displays = displays;
+          loadingState = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _displays = List<Display>();
+        if (mounted) loadingState = false;
+      });
+    }
   }
 
   @override
@@ -61,7 +80,4 @@ class DisplayScrollableViewState extends State<DisplayScrollableView> {
     _displays = [];
     _updateDisplays();
   }
-
-
-
 }

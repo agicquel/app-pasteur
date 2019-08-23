@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:lost_in_pasteur/req/request-constant.dart';
 import 'package:splashscreen/splashscreen.dart';
 
 import 'package:lost_in_pasteur/ui/homepage.dart';
 
+import 'ui/login-page.dart';
+
 void main() {
   runApp(new MaterialApp(
-    title: 'Lost in Pasteur',
-    home: new MyApp(),
-    theme: _buildLightTheme(),
-  ));
+      title: 'Lost in Pasteur',
+      home: new MyApp(),
+      theme: _buildLightTheme(),
+      debugShowCheckedModeBanner: false));
 }
 
 class MyApp extends StatefulWidget {
@@ -18,21 +22,48 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  StatefulWidget _displayedWidget;
+
+  @override
+  void initState() {
+    super.initState();
+    checkJwt();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return new SplashScreen(
-      seconds: 2,
-      navigateAfterSeconds: new Homepage(),
-      title: new Text(
-        'Lost in Pasteur',
-        style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
-      ),
-      image: Image.asset('graphics/logo-rond.png'),
-      backgroundColor: Colors.white,
-      styleTextUnderTheLoader: new TextStyle(),
-      photoSize: 100.0,
-      loaderColor: Colors.grey,
-    );
+    if (_displayedWidget == null) {
+      return Image.asset('graphics/logo-rond.png');
+    } else {
+      return new SplashScreen(
+        seconds: 2,
+        navigateAfterSeconds: _displayedWidget,
+        title: new Text(
+          'Lost in Pasteur',
+          style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
+        ),
+        image: Image.asset('graphics/logo-rond.png'),
+        backgroundColor: Colors.white,
+        styleTextUnderTheLoader: new TextStyle(),
+        photoSize: 100.0,
+        loaderColor: Colors.grey,
+      );
+    }
+  }
+
+  void checkJwt() async {
+    print("checkJwt");
+    final storage = new FlutterSecureStorage();
+    String key = await storage.read(key: 'jwt');
+    await storage.write(key: 'api_url', value: ConstantRequest.fullUrl);
+    print("key = " + key.toString());
+    setState(() {
+      if (key == null) {
+        _displayedWidget = new LoginPage();
+      } else {
+        _displayedWidget = new Homepage();
+      }
+    });
   }
 }
 

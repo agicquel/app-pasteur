@@ -25,7 +25,10 @@ dependencies:
   flutter_spinkit: "^3.1.0"
   liquid_pull_to_refresh: ^1.1.0
   circular_bottom_navigation: ^1.0.0
-
+  font_awesome_flutter: ^8.5.0
+  flutter_secure_storage: ^3.2.1+1
+  toggle_button: ^1.0.1
+  location_permissions: '^2.0.0'
 
 
   # The following adds the Cupertino Icons font to your application.

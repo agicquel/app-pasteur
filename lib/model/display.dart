@@ -1,5 +1,5 @@
 class Display {
-  final int id;
+  final String id;
   final String name;
   final String message;
   final String espId;
@@ -16,17 +16,17 @@ class Display {
 
   factory Display.fromJson(Map<String, dynamic> json) {
     return Display(
-      id: json['id'],
-      name: json['name'],
+      id: json['_id'] != null ? json['_id'] : json['espId'],
+      name: json['name'] != null ? json['name'] : "Afficheur",
       message: json['message'],
       espId: json['espId'],
-      createdAt: json['createdAt'],
-      updatedAt: json['updatedAt'],
+      createdAt: json['createdAt'] != null ? json['createdAt'] : "",
+      updatedAt: json['updatedAt'] != null ? json['updatedAt'] : "",
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id.toString(),
+        'id': id,
         'name': name,
         'message': message,
         'espId': espId,
@@ -37,7 +37,7 @@ class Display {
   @override
   String toString() {
     return '\nid = ' +
-        id.toString() +
+        id +
         '\nname = ' +
         name +
         '\nmessage = ' +

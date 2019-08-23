@@ -25,10 +25,9 @@ class DisplayEditorState extends State<DisplayEditor> {
   @override
   void initState() {
     super.initState();
-    if(widget.display == null) {
+    if (widget.display == null) {
       useDisplay = new Display(name: "", message: "", espId: "");
-    }
-    else {
+    } else {
       useDisplay = widget.display;
     }
     _displayNameTextController.text = useDisplay.name;
@@ -48,10 +47,9 @@ class DisplayEditorState extends State<DisplayEditor> {
   @override
   Widget build(BuildContext context) {
     var body;
-    if(loadingState) {
+    if (loadingState) {
       body = new SpinKitWave(color: Theme.of(context).primaryColor);
-    }
-    else {
+    } else {
       body = new SafeArea(
           top: false,
           bottom: false,
@@ -91,19 +89,19 @@ class DisplayEditorState extends State<DisplayEditor> {
                             setState(() {
                               loadingState = true;
                             });
-                            FocusScope.of(context).detach();
-                            bool ok = await DisplayRequest.removeDisplay(display);
-                            if(ok) {
+                            //FocusScope.of(context).detach();
+                            FocusScope.of(context).unfocus();
+                            bool ok =
+                                await DisplayRequest.removeDisplay(display);
+                            if (ok) {
                               Navigator.pop(context);
-                            }
-                            else {
+                            } else {
                               //Scaffold.of(context).showSnackBar(new SnackBar(content: Text("Une erreur est survenue")));
                               setState(() {
                                 loadingState = false;
                               });
                             }
-                          }
-                      )),
+                          })),
                   new Container(
                       padding: const EdgeInsets.only(top: 10.0),
                       child: new RaisedButton(
@@ -113,23 +111,21 @@ class DisplayEditorState extends State<DisplayEditor> {
                             setState(() {
                               loadingState = true;
                             });
-                            FocusScope.of(context).detach();
-                            bool ok = await DisplayRequest.updateDisplay(display);
-                            if(ok) {
+                            //FocusScope.of(context).detach();
+                            FocusScope.of(context).unfocus();
+                            bool ok =
+                                await DisplayRequest.updateDisplay(display);
+                            if (ok) {
                               Navigator.pop(context);
-                            }
-                            else {
+                            } else {
                               //Scaffold.of(context).showSnackBar(new SnackBar(content: Text("Une erreur est survenue")));
                               setState(() {
                                 loadingState = false;
                               });
                             }
-                          }
-                      )),
+                          })),
                 ],
-              )
-          )
-      );
+              )));
     }
     return new Scaffold(
       appBar: new AppBar(
@@ -150,11 +146,8 @@ class DisplayEditorState extends State<DisplayEditor> {
           message: _displayMessageTextController.text,
           espId: _displayEspIdTextController.text,
           createdAt: useDisplay.createdAt,
-          updatedAt: useDisplay.updatedAt
-      );
+          updatedAt: useDisplay.updatedAt);
       return newDisplay;
     }
   }
-
-
 }

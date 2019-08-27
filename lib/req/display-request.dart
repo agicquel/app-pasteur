@@ -6,7 +6,6 @@ import 'dart:async';
 
 class DisplayRequest {
   static Future<List<Display>> fetchDisplay() async {
-    print("fetch");
     try {
       final storage = new FlutterSecureStorage();
       final response = await http
@@ -15,7 +14,6 @@ class DisplayRequest {
         'x-access-token': await storage.read(key: 'jwt')
       });
       if (response.statusCode == 200) {
-        print("body = " + response.body);
         Iterable list = json.decode(response.body);
         return list.map((model) => Display.fromJson(model)).toList();
       } else {
@@ -30,7 +28,6 @@ class DisplayRequest {
   static Future<bool> updateDisplay(Display display) async {
     try {
       final storage = new FlutterSecureStorage();
-      print("display = " + display.toString());
       final response = await http.put(
           await storage.read(key: 'api_url') +
               '/displays/' +
@@ -40,8 +37,6 @@ class DisplayRequest {
             'x-access-token': await storage.read(key: 'jwt')
           },
           body: display.toJson());
-
-      print(response.statusCode);
 
       if (response.statusCode == 200) {
         return true;
@@ -89,6 +84,24 @@ class DisplayRequest {
             'x-access-token': await storage.read(key: 'jwt')
           });
 
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
+  static Future<bool> getRenameLopy(String ssid) async {
+    try {
+      final storage = new FlutterSecureStorage();
+      var sanitizer = new HtmlEscape();
+      final response = await http.get(await storage.read(key: 'api_url') +
+          '/rename/' +
+          sanitizer.convert(ssid));
       if (response.statusCode == 200) {
         return true;
       } else {

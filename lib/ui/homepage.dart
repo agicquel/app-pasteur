@@ -22,6 +22,7 @@ class HomepageState extends State<Homepage> {
   String titleAppBar = "";
   bool _identified = true;
   TextEditingController _macEspFieldController = TextEditingController();
+  TextEditingController _lopySsidFieldController = TextEditingController();
 
   @override
   initState() {
@@ -39,7 +40,6 @@ class HomepageState extends State<Homepage> {
   void checkJwt() async {
     final storage = new FlutterSecureStorage();
     String key = await storage.read(key: 'jwt');
-    print("key = " + key.toString());
     setState(() {
       if (key == null) {
         _identified = false;
@@ -120,18 +120,26 @@ class HomepageState extends State<Homepage> {
                 entries.add(PopupMenuItem<String>(
                     value: "deconnection", child: Text("Se connecter")));
               }
+              if(selectedPos == 1) {
+                entries.add(PopupMenuItem<String>(
+                    value: "rename", child: Text("Renommer le LoPy")));
+              }
               return entries;
             },
             onSelected: (String selected) {
-              print("ici callback");
-              if (_identified) {
-                final storage = new FlutterSecureStorage();
-                storage.deleteAll();
+              if(selected == "rename") {
+                _renameLopyDialog(context);
               }
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => new LoginPage()),
-              );
+              else {
+                if (_identified) {
+                  final storage = new FlutterSecureStorage();
+                  storage.deleteAll();
+                }
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => new LoginPage()),
+                );
+              }
             },
           )
         ],
@@ -233,7 +241,7 @@ class HomepageState extends State<Homepage> {
               new FlatButton(
                 child: new Text('Ajouter'),
                 onPressed: () {
-                  addDisplay(context, _macEspFieldController.text.toString());
+                  _addDisplay(context, _macEspFieldController.text.toString());
                   Navigator.of(context).pop();
                 },
               )
@@ -242,7 +250,7 @@ class HomepageState extends State<Homepage> {
         });
   }
 
-  void addDisplay(BuildContext context, String espId) async {
+  void _addDisplay(BuildContext context, String espId) async {
     bool res = await DisplayRequest.declareDisplay(espId);
     if(res) {
       _scaffoldKey.currentState?.removeCurrentSnackBar();
@@ -252,6 +260,48 @@ class HomepageState extends State<Homepage> {
     else {
       _scaffoldKey.currentState?.removeCurrentSnackBar();
       _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("Erreur lors de l'ajout de l'afficheur.")));
+    }
+  }
+
+  void _renameLopyDialog(BuildContext context) async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Renommer le LoPy'),
+            content: TextField(
+              controller: _lopySsidFieldController,
+              decoration: InputDecoration(hintText: "Nouveau nom"),
+            ),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text('Annuler'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              new FlatButton(
+                child: new Text('Sauvegarder'),
+                onPressed: () {
+                  _renameLopy(context, _lopySsidFieldController.text.toString());
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        });
+  }
+
+  void _renameLopy(BuildContext context, String ssid) async {
+    bool res = await DisplayRequest.getRenameLopy(ssid);
+    if(res) {
+      _scaffoldKey.currentState?.removeCurrentSnackBar();
+      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text('LoPy renommé avec succès.')));
+      setState(() {});
+    }
+    else {
+      _scaffoldKey.currentState?.removeCurrentSnackBar();
+      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("Impossible de renommer le LoPy.")));
     }
   }
 }

@@ -52,11 +52,9 @@ class _MyAppState extends State<MyApp> {
   }
 
   void checkJwt() async {
-    print("checkJwt");
     final storage = new FlutterSecureStorage();
     String key = await storage.read(key: 'jwt');
     await storage.write(key: 'api_url', value: ConstantRequest.fullUrl);
-    print("key = " + key.toString());
     setState(() {
       if (key == null) {
         _displayedWidget = new LoginPage();

@@ -17,12 +17,18 @@ class Homepage extends StatefulWidget {
 
 class HomepageState extends State<Homepage> {
   StreamSubscription<ConnectivityResult> connectionListener;
-  int selectedPos = 3;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   String titleAppBar = "";
   bool _identified = true;
   TextEditingController _macEspFieldController = TextEditingController();
   TextEditingController _lopySsidFieldController = TextEditingController();
+  /*
+   * 0 : Connected to a 4G network and identified
+   * 1 : Connected to a LoPy network
+   * 2 : Connected but not identified
+   * 3 : No connection
+   */
+  int selectedPos = 3;
 
   @override
   initState() {

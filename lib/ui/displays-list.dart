@@ -29,8 +29,24 @@ class DisplayScrollableViewState extends State<DisplayScrollableView> {
               itemCount: _displays.length,
               itemBuilder: (context, index) {
                 Display display = _displays[index];
+                Color decoColor = Colors.green;
+                if(display.lastLopy.isEmpty ) {
+                  decoColor = Colors.red;
+                }
+                else if(!display.lopyMessageSync) {
+                  decoColor = Colors.orange;
+                }
                 ListTile tile = new ListTile(
-                  leading: Icon(Icons.cloud_queue),
+                  leading: Container(
+                    width: 48,
+                    height: 48,
+                    child: Icon(Icons.cloud_queue, color: Colors.black,),
+                    decoration: new BoxDecoration(
+                      color: decoColor.withOpacity(0.5),
+                      shape: BoxShape.circle,
+
+                    ),
+                  ),
                   title: new Text('Nom : ' + display.name),
                   subtitle: Text('ESP : ' +
                       display.espId +

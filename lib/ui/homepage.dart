@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:location_permissions/location_permissions.dart';
 import 'package:lost_in_pasteur/req/display-request.dart';
 import 'package:lost_in_pasteur/req/request-constant.dart';
+import 'package:lost_in_pasteur/ui/no-connection.dart';
+import 'package:lost_in_pasteur/ui/request-connection.dart';
 import 'displays-list.dart';
 import 'login-page.dart';
 
@@ -22,17 +25,23 @@ class HomepageState extends State<Homepage> {
   bool _identified = true;
   TextEditingController _macEspFieldController = TextEditingController();
   TextEditingController _lopySsidFieldController = TextEditingController();
-  /*
-   * 0 : Connected to a 4G network and identified
-   * 1 : Connected to a LoPy network
-   * 2 : Connected but not identified
-   * 3 : No connection
-   */
-  int selectedPos = 3;
+  PageController _pageController;
+
+  /// 0 : Connected to a 4G network and identified
+  /// 1 : Connected to a LoPy network
+  /// 2 : Connected but not identified
+  /// 3 : No connection
+  int _connectionState = 3;
+
+  /// 0 : Displays
+  /// 1 : Lopys
+  /// 2 : Network
+  int _currentIndex = 0;
 
   @override
   initState() {
     super.initState();
+    _pageController = PageController();
     connectionListener = Connectivity()
         .onConnectivityChanged
         .listen((ConnectivityResult connectivityResult) {
@@ -59,7 +68,8 @@ class HomepageState extends State<Homepage> {
     if (connectivityResult == ConnectivityResult.mobile) {
       saveUrl(ConstantRequest.fullUrl);
       setState(() {
-        selectedPos = _identified ? 0 : 2;
+        _connectionState = _identified ? 0 : 2;
+        _currentIndex = _identified ? 0 : 4;
       });
     } else if (connectivityResult == ConnectivityResult.wifi) {
       String ssid = await Connectivity().getWifiName();
@@ -72,7 +82,9 @@ class HomepageState extends State<Homepage> {
           if (newPermission != PermissionStatus.granted) {
             saveUrl(ConstantRequest.fullUrl);
             setState(() {
-              selectedPos = 3;
+              _connectionState = 3;
+              _currentIndex = 5;
+
             });
           } else {
             checkConnectivity();
@@ -81,17 +93,20 @@ class HomepageState extends State<Homepage> {
       } else if (ssid.startsWith('Lopy_HP_')) {
         saveUrl(ConstantRequest.lopyUrl);
         setState(() {
-          selectedPos = 1;
+          _connectionState = 1;
+          _currentIndex = 0;
         });
       } else {
         saveUrl(ConstantRequest.fullUrl);
         setState(() {
-          selectedPos = _identified ? 0 : 2;
+          _connectionState = _identified ? 0 : 2;
+          _currentIndex = _identified ? 0 : 4;
         });
       }
     } else {
       setState(() {
-        selectedPos = 3;
+        _connectionState = 3;
+        _currentIndex = 5;
       });
     }
   }
@@ -103,8 +118,9 @@ class HomepageState extends State<Homepage> {
 
   @override
   dispose() {
-    super.dispose();
+    _pageController.dispose();
     connectionListener.cancel();
+    super.dispose();
   }
 
   @override
@@ -126,7 +142,7 @@ class HomepageState extends State<Homepage> {
                 entries.add(PopupMenuItem<String>(
                     value: "deconnection", child: Text("Se connecter")));
               }
-              if(selectedPos == 1) {
+              if(_currentIndex == 0 && _connectionState == 1) {
                 entries.add(PopupMenuItem<String>(
                     value: "rename", child: Text("Renommer le LoPy")));
               }
@@ -151,13 +167,61 @@ class HomepageState extends State<Homepage> {
         ],
       ),
       floatingActionButton: getFloatingActionButton(context),
-      body: bodyContainer(),
+      //body: bodyContainer(),
+      body: SizedBox.expand(
+        child: PageView(
+          controller: _pageController,
+          onPageChanged: (index) {
+            setState(() => _currentIndex = index);
+          },
+          children: <Widget>[
+            new DisplayScrollableView(),
+            Container(color: Colors.red,),
+            Container(color: Colors.green,),
+            Container(color: Colors.blue,),
+            NoConnection(),
+            RequestConnection(),
+          ],
+        ),
+      ),
+      bottomNavigationBar: BottomNavyBar(
+        selectedIndex: _currentIndex,
+        showElevation: true, // use this to remove appBar's elevation
+        onItemSelected: (index) {
+          setState(() => _currentIndex = index);
+          _pageController.jumpToPage(index);
+        },
+        items: [
+          BottomNavyBarItem(
+            icon: Icon(Icons.devices),
+            title: Text('Afficheurs'),
+            activeColor: Colors.red,
+          ),
+          BottomNavyBarItem(
+              icon: Icon(Icons.router),
+              title: Text('Routers'),
+              activeColor: Colors.purpleAccent
+          ),
+          BottomNavyBarItem(
+              icon: Icon(Icons.multiline_chart),
+              title: Text('Réseau'),
+              activeColor: Colors.pink
+          ),
+          BottomNavyBarItem(
+              icon: Icon(Icons.settings),
+              title: Text('Paramètres'),
+              activeColor: Colors.blue
+          ),
+        ],
+      ),
     );
   }
 
   FloatingActionButton getFloatingActionButton(BuildContext context) {
-    FloatingActionButton floatingActionButton = null;
-    switch (selectedPos) {
+    if(_currentIndex != 0) return null;
+
+    FloatingActionButton floatingActionButton;
+    switch (_connectionState) {
       case 0:
         floatingActionButton = FloatingActionButton(
             onPressed: () => _addDisplayDialog(context),
@@ -172,58 +236,6 @@ class HomepageState extends State<Homepage> {
         break;
     }
     return floatingActionButton;
-  }
-
-  Widget bodyContainer() {
-    Widget selectedWidget;
-    switch (selectedPos) {
-      case 0:
-      case 1:
-        selectedWidget = new DisplayScrollableView();
-        break;
-      case 2:
-        selectedWidget = Padding(
-          padding: EdgeInsets.only(bottom: 100),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Icon(
-                  Icons.cloud_off,
-                  size: 150,
-                ),
-                Text(
-                    "Veillez vous identifier ou \nalors connectez vous à un LoPy.",
-                    style: TextStyle(fontSize: 18),
-                    textAlign: TextAlign.center)
-              ],
-            ),
-          ),
-        );
-        break;
-      case 3:
-        selectedWidget = Padding(
-          padding: EdgeInsets.only(bottom: 100),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Image.asset(
-                  'graphics/logo-rond-sad.png',
-                  width: 150,
-                  height: 150,
-                ),
-                Text("Pas de connexion !",
-                    style: TextStyle(fontSize: 18), textAlign: TextAlign.center)
-              ],
-            ),
-          ),
-        );
-    }
-
-    return selectedWidget;
   }
 
   void _addDisplayDialog(BuildContext context) async {

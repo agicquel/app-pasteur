@@ -25,14 +25,12 @@ class DisplayEditorState extends State<DisplayEditor> {
   @override
   void initState() {
     super.initState();
-    if (widget.display == null) {
-      useDisplay = new Display(name: "", message: "", espId: "");
-    } else {
+    if (widget.display != null) {
       useDisplay = widget.display;
+      _displayNameTextController.text = useDisplay.name;
+      _displayMessageTextController.text = useDisplay.message;
+      _displayEspIdTextController.text = useDisplay.espId;
     }
-    _displayNameTextController.text = useDisplay.name;
-    _displayMessageTextController.text = useDisplay.message;
-    _displayEspIdTextController.text = useDisplay.espId;
     loadingState = false;
   }
 
@@ -146,7 +144,10 @@ class DisplayEditorState extends State<DisplayEditor> {
           message: _displayMessageTextController.text,
           espId: _displayEspIdTextController.text,
           createdAt: useDisplay.createdAt,
-          updatedAt: useDisplay.updatedAt);
+          updatedAt: useDisplay.updatedAt,
+          lopyMessageSeq: useDisplay.lopyMessageSeq,
+          lopyMessageSync: useDisplay.lopyMessageSync,
+          lastLopy: useDisplay.lastLopy);
       return newDisplay;
     }
   }

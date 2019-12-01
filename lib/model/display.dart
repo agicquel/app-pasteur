@@ -5,6 +5,9 @@ class Display {
   final String espId;
   final String createdAt;
   final String updatedAt;
+  final int lopyMessageSeq;
+  final bool lopyMessageSync;
+  final String lastLopy;
 
   Display(
       {this.id,
@@ -12,7 +15,10 @@ class Display {
       this.message,
       this.espId,
       this.createdAt,
-      this.updatedAt});
+      this.updatedAt,
+      this.lopyMessageSeq,
+      this.lopyMessageSync,
+      this.lastLopy});
 
   factory Display.fromJson(Map<String, dynamic> json) {
     return Display(
@@ -22,6 +28,9 @@ class Display {
       espId: json['espId'],
       createdAt: json['createdAt'] != null ? json['createdAt'] : "",
       updatedAt: json['updatedAt'] != null ? json['updatedAt'] : "",
+      lopyMessageSeq: json['lopyMessageSeq'] != null ? json['lopyMessageSeq'] : -1,
+      lopyMessageSync: json['lopyMessageSync'] != null ? json['lopyMessageSync'] : false,
+      lastLopy: json['lastLopy'] != null ? json['lastLopy'] : ""
     );
   }
 
@@ -32,6 +41,9 @@ class Display {
         'espId': espId,
         'createdAt': createdAt,
         'updatedAt': updatedAt,
+        'lopyMessageSeq': lopyMessageSeq.toString(),
+        'lopyMessageSync': lopyMessageSync.toString(),
+        'lastLopy': lastLopy,
       };
 
   @override
@@ -47,6 +59,12 @@ class Display {
         '\ncreatedAt = ' +
         createdAt +
         '\nupdatedAt = ' +
-        updatedAt;
+        updatedAt +
+        '\nlopyMessageSeq = ' +
+        lopyMessageSeq.toString() +
+        '\nlopyMessageSync = ' +
+        lopyMessageSync.toString() +
+        '\nlastLopy = ' +
+        lastLopy;
   }
 }

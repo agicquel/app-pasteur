@@ -30,7 +30,7 @@ class DisplayScrollableViewState extends State<DisplayScrollableView> {
               itemBuilder: (context, index) {
                 Display display = _displays[index];
                 Color decoColor = Colors.green;
-                if(display.lastLopy.isEmpty ) {
+                if(display.lastLopy.isEmpty || display.lastLopy == "null") {
                   decoColor = Colors.red;
                 }
                 else if(!display.lopyMessageSync) {

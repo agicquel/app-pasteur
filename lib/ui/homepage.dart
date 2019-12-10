@@ -12,8 +12,10 @@ import 'displays-list.dart';
 import 'login-page.dart';
 
 class Homepage extends StatefulWidget {
+
   @override
   State<StatefulWidget> createState() {
+
     return new HomepageState();
   }
 }
@@ -21,7 +23,7 @@ class Homepage extends StatefulWidget {
 class HomepageState extends State<Homepage> {
   StreamSubscription<ConnectivityResult> connectionListener;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  String titleAppBar = "";
+  var _titleAppBar = ["Mes afficheurs", "Mes routeurs", "État du réseau", "Paramètres"];
   bool _identified = true;
   TextEditingController _macEspFieldController = TextEditingController();
   TextEditingController _lopySsidFieldController = TextEditingController();
@@ -31,11 +33,12 @@ class HomepageState extends State<Homepage> {
   /// 1 : Connected to a LoPy network
   /// 2 : Connected but not identified
   /// 3 : No connection
-  int _connectionState = 3;
+  static int connectionState = 3;
 
   /// 0 : Displays
   /// 1 : Lopys
   /// 2 : Network
+  /// 3 : Settings
   int _currentIndex = 0;
 
   @override
@@ -49,7 +52,7 @@ class HomepageState extends State<Homepage> {
     });
     checkJwt();
     checkConnectivity();
-    titleAppBar = "Mes afficheurs";
+
   }
 
   void checkJwt() async {
@@ -68,7 +71,7 @@ class HomepageState extends State<Homepage> {
     if (connectivityResult == ConnectivityResult.mobile) {
       saveUrl(ConstantRequest.fullUrl);
       setState(() {
-        _connectionState = _identified ? 0 : 2;
+        connectionState = _identified ? 0 : 2;
         _currentIndex = _identified ? 0 : 4;
       });
     } else if (connectivityResult == ConnectivityResult.wifi) {
@@ -82,7 +85,7 @@ class HomepageState extends State<Homepage> {
           if (newPermission != PermissionStatus.granted) {
             saveUrl(ConstantRequest.fullUrl);
             setState(() {
-              _connectionState = 3;
+              connectionState = 3;
               _currentIndex = 5;
 
             });
@@ -93,19 +96,19 @@ class HomepageState extends State<Homepage> {
       } else if (ssid.startsWith('Lopy_HP_')) {
         saveUrl(ConstantRequest.lopyUrl);
         setState(() {
-          _connectionState = 1;
+          connectionState = 1;
           _currentIndex = 0;
         });
       } else {
         saveUrl(ConstantRequest.fullUrl);
         setState(() {
-          _connectionState = _identified ? 0 : 2;
+          connectionState = _identified ? 0 : 2;
           _currentIndex = _identified ? 0 : 4;
         });
       }
     } else {
       setState(() {
-        _connectionState = 3;
+        connectionState = 3;
         _currentIndex = 5;
       });
     }
@@ -127,45 +130,7 @@ class HomepageState extends State<Homepage> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar: new AppBar(
-        elevation: 0.1,
-        title: new Text(titleAppBar),
-        actions: <Widget>[
-          PopupMenuButton<String>(
-            itemBuilder: (BuildContext context) {
-              List<PopupMenuEntry<String>> entries =
-                  List<PopupMenuEntry<String>>();
-              if (_identified) {
-                entries.add(PopupMenuItem<String>(
-                    value: "connection", child: Text("Se déconnecter")));
-              } else {
-                entries.add(PopupMenuItem<String>(
-                    value: "deconnection", child: Text("Se connecter")));
-              }
-              if(_currentIndex == 0 && _connectionState == 1) {
-                entries.add(PopupMenuItem<String>(
-                    value: "rename", child: Text("Renommer le LoPy")));
-              }
-              return entries;
-            },
-            onSelected: (String selected) {
-              if(selected == "rename") {
-                _renameLopyDialog(context);
-              }
-              else {
-                if (_identified) {
-                  final storage = new FlutterSecureStorage();
-                  storage.deleteAll();
-                }
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => new LoginPage()),
-                );
-              }
-            },
-          )
-        ],
-      ),
+      appBar: getAppBar(),
       floatingActionButton: getFloatingActionButton(context),
       //body: bodyContainer(),
       body: SizedBox.expand(
@@ -199,7 +164,7 @@ class HomepageState extends State<Homepage> {
           ),
           BottomNavyBarItem(
               icon: Icon(Icons.router),
-              title: Text('Routers'),
+              title: Text('Routeurs'),
               activeColor: Colors.purpleAccent
           ),
           BottomNavyBarItem(
@@ -221,7 +186,7 @@ class HomepageState extends State<Homepage> {
     if(_currentIndex != 0) return null;
 
     FloatingActionButton floatingActionButton;
-    switch (_connectionState) {
+    switch (connectionState) {
       case 0:
         floatingActionButton = FloatingActionButton(
             onPressed: () => _addDisplayDialog(context),
@@ -321,5 +286,47 @@ class HomepageState extends State<Homepage> {
       _scaffoldKey.currentState?.removeCurrentSnackBar();
       _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("Impossible de renommer le LoPy.")));
     }
+  }
+
+  getAppBar() {
+    return new AppBar(
+      elevation: 0.1,
+      title: new Text(_titleAppBar[_currentIndex]),
+      actions: <Widget>[
+        PopupMenuButton<String>(
+          itemBuilder: (BuildContext context) {
+            List<PopupMenuEntry<String>> entries =
+            List<PopupMenuEntry<String>>();
+            if (_identified) {
+              entries.add(PopupMenuItem<String>(
+                  value: "connection", child: Text("Se déconnecter")));
+            } else {
+              entries.add(PopupMenuItem<String>(
+                  value: "deconnection", child: Text("Se connecter")));
+            }
+            if(_currentIndex == 0 && connectionState == 1) {
+              entries.add(PopupMenuItem<String>(
+                  value: "rename", child: Text("Renommer le LoPy")));
+            }
+            return entries;
+          },
+          onSelected: (String selected) {
+            if(selected == "rename") {
+              _renameLopyDialog(context);
+            }
+            else {
+              if (_identified) {
+                final storage = new FlutterSecureStorage();
+                storage.deleteAll();
+              }
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => new LoginPage()),
+              );
+            }
+          },
+        )
+      ],
+    );
   }
 }

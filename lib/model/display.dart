@@ -1,3 +1,5 @@
+import 'package:lost_in_pasteur/model/display-history.dart';
+
 class Display {
   final String id;
   final String name;
@@ -8,6 +10,7 @@ class Display {
   final int lopyMessageSeq;
   final bool lopyMessageSync;
   final String lastLopy;
+  final List<DisplayHistory> history;
 
   Display(
       {this.id,
@@ -18,9 +21,12 @@ class Display {
       this.updatedAt,
       this.lopyMessageSeq,
       this.lopyMessageSync,
-      this.lastLopy});
+      this.lastLopy,
+      this.history});
 
   factory Display.fromJson(Map<String, dynamic> json) {
+    List hist = json['history'] != null ? json['history'] as List : List;
+
     return Display(
       id: json['_id'] != null ? json['_id'] : json['espId'],
       name: json['name'] != null ? json['name'] : "Afficheur",
@@ -30,7 +36,8 @@ class Display {
       updatedAt: json['updatedAt'] != null ? json['updatedAt'] : "",
       lopyMessageSeq: json['lopyMessageSeq'] != null ? json['lopyMessageSeq'] : -1,
       lopyMessageSync: json['lopyMessageSync'] != null ? json['lopyMessageSync'] : false,
-      lastLopy: json['lastLopy'] != null ? json['lastLopy'] : ""
+      lastLopy: json['lastLopy'] != null ? json['lastLopy'] : "",
+      history: hist.map((h) => DisplayHistory.fromJson(h)).toList().reversed.toList()
     );
   }
 
@@ -65,6 +72,7 @@ class Display {
         '\nlopyMessageSync = ' +
         lopyMessageSync.toString() +
         '\nlastLopy = ' +
-        lastLopy;
+        lastLopy +
+        '\nhistory (' + history.length.toString() + ')' ;
   }
 }

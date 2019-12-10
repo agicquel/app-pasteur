@@ -10,6 +10,7 @@ import 'package:lost_in_pasteur/ui/no-connection.dart';
 import 'package:lost_in_pasteur/ui/request-connection.dart';
 import 'displays-list.dart';
 import 'login-page.dart';
+import 'lopys-list.dart';
 
 class Homepage extends StatefulWidget {
 
@@ -24,6 +25,7 @@ class HomepageState extends State<Homepage> {
   StreamSubscription<ConnectivityResult> connectionListener;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   var _titleAppBar = ["Mes afficheurs", "Mes routeurs", "État du réseau", "Paramètres"];
+  var _barColors = [Colors.red, Colors.purpleAccent, Colors.pink, Colors.blue];
   bool _identified = true;
   TextEditingController _macEspFieldController = TextEditingController();
   TextEditingController _lopySsidFieldController = TextEditingController();
@@ -141,9 +143,9 @@ class HomepageState extends State<Homepage> {
           },
           children: <Widget>[
             new DisplayScrollableView(),
-            Container(color: Colors.red,),
-            Container(color: Colors.green,),
-            Container(color: Colors.blue,),
+            new LopyScrollableView(),
+            Container(color: Colors.white,),
+            Container(color: Colors.white,),
             NoConnection(),
             RequestConnection(),
           ],
@@ -292,6 +294,7 @@ class HomepageState extends State<Homepage> {
     return new AppBar(
       elevation: 0.1,
       title: new Text(_titleAppBar[_currentIndex]),
+      //backgroundColor: _barColors[_currentIndex],
       actions: <Widget>[
         PopupMenuButton<String>(
           itemBuilder: (BuildContext context) {

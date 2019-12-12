@@ -24,7 +24,7 @@ class Homepage extends StatefulWidget {
 class HomepageState extends State<Homepage> {
   StreamSubscription<ConnectivityResult> connectionListener;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  var _titleAppBar = ["Mes afficheurs", "Mes routeurs", "État du réseau", "Paramètres"];
+  var _titleAppBar = ["Mes afficheurs", "Mes routeurs", "État du réseau", "Paramètres", "Pas de réseau", "Demande de connexion"];
   var _barColors = [Colors.red, Colors.purpleAccent, Colors.pink, Colors.blue];
   bool _identified = true;
   TextEditingController _macEspFieldController = TextEditingController();

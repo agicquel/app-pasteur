@@ -44,7 +44,6 @@ class DisplayScrollableViewState extends State<DisplayScrollableView> {
                     decoration: new BoxDecoration(
                       color: decoColor.withOpacity(0.5),
                       shape: BoxShape.circle,
-
                     ),
                   ),
                   title: new Text('Nom : ' + display.name),

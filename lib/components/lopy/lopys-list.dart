@@ -5,7 +5,8 @@ import 'package:lost_in_pasteur/model/lopy.dart';
 import 'package:lost_in_pasteur/req/display-request.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:lost_in_pasteur/req/lopy-request.dart';
-import 'display-editor.dart';
+import '../display/display-editor.dart';
+import 'lopy-page.dart';
 
 class LopyScrollableView extends StatefulWidget {
   @override
@@ -22,7 +23,9 @@ class LopyScrollableViewState extends State<LopyScrollableView> {
   Widget build(BuildContext context) {
     if (loadingState) {
       return new SpinKitWave(
-        color: Theme.of(context).primaryColor,
+        color: Theme
+            .of(context)
+            .primaryColor,
       );
     } else {
       return new LiquidPullToRefresh(
@@ -44,6 +47,12 @@ class LopyScrollableViewState extends State<LopyScrollableView> {
                       lopy.updatedAt),
                   trailing: Icon(Icons.keyboard_arrow_right),
                   onTap: () {
+                    Navigator.push(
+                        context,
+                        new MaterialPageRoute(
+                            builder: (context) =>
+                            new LopyPage(lopy: lopy,
+                            ))).then((value) {});
                   },
                 );
                 return new Card(

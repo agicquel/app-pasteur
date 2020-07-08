@@ -6,17 +6,15 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:location_permissions/location_permissions.dart';
 import 'package:lost_in_pasteur/req/display-request.dart';
 import 'package:lost_in_pasteur/req/request-constant.dart';
-import 'package:lost_in_pasteur/ui/no-connection.dart';
-import 'package:lost_in_pasteur/ui/request-connection.dart';
-import 'displays-list.dart';
+import 'package:lost_in_pasteur/components/no-connection.dart';
+import 'package:lost_in_pasteur/components/request-connection.dart';
+import 'display/displays-list.dart';
 import 'login-page.dart';
-import 'lopys-list.dart';
+import 'lopy/lopys-list.dart';
 
 class Homepage extends StatefulWidget {
-
   @override
   State<StatefulWidget> createState() {
-
     return new HomepageState();
   }
 }
@@ -24,7 +22,14 @@ class Homepage extends StatefulWidget {
 class HomepageState extends State<Homepage> {
   StreamSubscription<ConnectivityResult> connectionListener;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  var _titleAppBar = ["Mes afficheurs", "Mes routeurs", "État du réseau", "Paramètres", "Pas de réseau", "Demande de connexion"];
+  var _titleAppBar = [
+    "Mes afficheurs",
+    "Mes routeurs",
+    "État du réseau",
+    "Paramètres",
+    "Pas de réseau",
+    "Demande de connexion"
+  ];
   var _barColors = [Colors.red, Colors.purpleAccent, Colors.pink, Colors.blue];
   bool _identified = true;
   TextEditingController _macEspFieldController = TextEditingController();
@@ -54,7 +59,6 @@ class HomepageState extends State<Homepage> {
     });
     checkJwt();
     checkConnectivity();
-
   }
 
   void checkJwt() async {
@@ -89,7 +93,6 @@ class HomepageState extends State<Homepage> {
             setState(() {
               connectionState = 3;
               _currentIndex = 5;
-
             });
           } else {
             checkConnectivity();
@@ -144,8 +147,12 @@ class HomepageState extends State<Homepage> {
           children: <Widget>[
             new DisplayScrollableView(),
             new LopyScrollableView(),
-            Container(color: Colors.white,),
-            Container(color: Colors.white,),
+            Container(
+              color: Colors.white,
+            ),
+            Container(
+              color: Colors.white,
+            ),
             NoConnection(),
             RequestConnection(),
           ],
@@ -167,25 +174,22 @@ class HomepageState extends State<Homepage> {
           BottomNavyBarItem(
               icon: Icon(Icons.router),
               title: Text('Routeurs'),
-              activeColor: Colors.purpleAccent
-          ),
+              activeColor: Colors.purpleAccent),
           BottomNavyBarItem(
               icon: Icon(Icons.multiline_chart),
               title: Text('Réseau'),
-              activeColor: Colors.pink
-          ),
+              activeColor: Colors.pink),
           BottomNavyBarItem(
               icon: Icon(Icons.settings),
               title: Text('Paramètres'),
-              activeColor: Colors.blue
-          ),
+              activeColor: Colors.blue),
         ],
       ),
     );
   }
 
   FloatingActionButton getFloatingActionButton(BuildContext context) {
-    if(_currentIndex != 0) return null;
+    if (_currentIndex != 0) return null;
 
     FloatingActionButton floatingActionButton;
     switch (connectionState) {
@@ -194,6 +198,7 @@ class HomepageState extends State<Homepage> {
             onPressed: () => _addDisplayDialog(context),
             child: Icon(
               Icons.add,
+              color: Colors.white,
             ));
         break;
       case 1:
@@ -237,14 +242,15 @@ class HomepageState extends State<Homepage> {
 
   void _addDisplay(BuildContext context, String espId) async {
     bool res = await DisplayRequest.declareDisplay(espId);
-    if(res) {
+    if (res) {
       _scaffoldKey.currentState?.removeCurrentSnackBar();
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text('Afficheur ajouté avec succès.')));
+      _scaffoldKey.currentState.showSnackBar(
+          SnackBar(content: Text('Afficheur ajouté avec succès.')));
       setState(() {});
-    }
-    else {
+    } else {
       _scaffoldKey.currentState?.removeCurrentSnackBar();
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("Erreur lors de l'ajout de l'afficheur.")));
+      _scaffoldKey.currentState.showSnackBar(
+          SnackBar(content: Text("Erreur lors de l'ajout de l'afficheur.")));
     }
   }
 
@@ -268,7 +274,8 @@ class HomepageState extends State<Homepage> {
               new FlatButton(
                 child: new Text('Sauvegarder'),
                 onPressed: () {
-                  _renameLopy(context, _lopySsidFieldController.text.toString());
+                  _renameLopy(
+                      context, _lopySsidFieldController.text.toString());
                   Navigator.of(context).pop();
                 },
               )
@@ -279,14 +286,15 @@ class HomepageState extends State<Homepage> {
 
   void _renameLopy(BuildContext context, String ssid) async {
     bool res = await DisplayRequest.getRenameLopy(ssid);
-    if(res) {
+    if (res) {
       _scaffoldKey.currentState?.removeCurrentSnackBar();
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text('LoPy renommé avec succès.')));
+      _scaffoldKey.currentState
+          .showSnackBar(SnackBar(content: Text('LoPy renommé avec succès.')));
       setState(() {});
-    }
-    else {
+    } else {
       _scaffoldKey.currentState?.removeCurrentSnackBar();
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("Impossible de renommer le LoPy.")));
+      _scaffoldKey.currentState.showSnackBar(
+          SnackBar(content: Text("Impossible de renommer le LoPy.")));
     }
   }
 
@@ -299,7 +307,7 @@ class HomepageState extends State<Homepage> {
         PopupMenuButton<String>(
           itemBuilder: (BuildContext context) {
             List<PopupMenuEntry<String>> entries =
-            List<PopupMenuEntry<String>>();
+                List<PopupMenuEntry<String>>();
             if (_identified) {
               entries.add(PopupMenuItem<String>(
                   value: "connection", child: Text("Se déconnecter")));
@@ -307,17 +315,16 @@ class HomepageState extends State<Homepage> {
               entries.add(PopupMenuItem<String>(
                   value: "deconnection", child: Text("Se connecter")));
             }
-            if(_currentIndex == 0 && connectionState == 1) {
+            if (_currentIndex == 0 && connectionState == 1) {
               entries.add(PopupMenuItem<String>(
                   value: "rename", child: Text("Renommer le LoPy")));
             }
             return entries;
           },
           onSelected: (String selected) {
-            if(selected == "rename") {
+            if (selected == "rename") {
               _renameLopyDialog(context);
-            }
-            else {
+            } else {
               if (_identified) {
                 final storage = new FlutterSecureStorage();
                 storage.deleteAll();

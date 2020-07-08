@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:lost_in_pasteur/model/lopy-status.dart';
+import 'package:lost_in_pasteur/model/lopy.dart';
 
 class LopyPage extends StatelessWidget {
 
-  final LopyStatus lopyStatus;
+  final Lopy lopy;
 
-  const LopyPage({Key key, this.lopyStatus}) : super(key: key);
+  const LopyPage({Key key, this.lopy}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +14,7 @@ class LopyPage extends StatelessWidget {
       children: <Widget>[
         new TextFormField(
           decoration: InputDecoration(
-            icon: displayIcon,
+            icon: Icon(Icons.router, color: Colors.black,),
             labelText: 'Name',
           ),
         ),
@@ -37,29 +37,7 @@ class LopyPage extends StatelessWidget {
             labelText: 'État',
           ),
           readOnly: true,
-        ),
-        new Container(
-            padding: const EdgeInsets.only(top: 10.0),
-            child: new RaisedButton(
-                child: const Text('Sauvegarder'),
-                onPressed: () async {
-                  Display display = _generateFromForm();
-                  setState(() {
-                    loadingState = true;
-                  });
-                  //FocusScope.of(context).detach();
-                  FocusScope.of(context).unfocus();
-                  bool ok =
-                  await DisplayRequest.updateDisplay(display);
-                  if (ok) {
-                    Navigator.pop(context);
-                  } else {
-                    //Scaffold.of(context).showSnackBar(new SnackBar(content: Text("Une erreur est survenue")));
-                    setState(() {
-                      loadingState = false;
-                    });
-                  }
-                })),
+        )
       ],
     );
     return new Scaffold(

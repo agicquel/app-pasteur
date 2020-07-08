@@ -4,9 +4,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:lost_in_pasteur/req/request-constant.dart';
 import 'package:splashscreen/splashscreen.dart';
 
-import 'package:lost_in_pasteur/ui/homepage.dart';
-
-import 'ui/login-page.dart';
+import 'package:lost_in_pasteur/components/homepage.dart';
+import 'package:lost_in_pasteur/components/login-page.dart';
 
 void main() {
   runApp(new MaterialApp(

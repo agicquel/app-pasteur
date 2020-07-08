@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:lost_in_pasteur/model/display.dart';
 import 'package:lost_in_pasteur/req/display-request.dart';
-import 'package:lost_in_pasteur/ui/homepage.dart';
+import 'package:lost_in_pasteur/components/homepage.dart';
 
 import 'display-history-list.dart';
 
